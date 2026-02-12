@@ -117,7 +117,9 @@ export class TextileGenerator {
     }
     
     return rows.map((row, rowIndex) => {
-      if (!row.children) return '';
+      if (!row.children) {
+        return '';
+      }
       
       const isFirstRow = rowIndex === 0 && hasHeaderRow;
       

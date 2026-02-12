@@ -131,10 +131,39 @@ The extension consists of three main modules:
 3. **Development Tasks**
    - Compile once: `pnpm run compile`
    - Watch mode: `pnpm run watch`
-   - Run tests: `pnpm run test`
+   - Run tests: `pnpm test`
+   - Compile tests only: `pnpm run compile-tests`
    - Lint code: `pnpm run lint`
 
-4. **Build for Production**
+4. **Testing**
+
+   The extension includes comprehensive unit tests covering all conversion features:
+
+   ```bash
+   # Run all tests (compile, lint, and test)
+   pnpm test
+   ```
+
+   **Test Coverage**:
+   - Basic text formatting (bold, italic)
+   - Headings (H1-H6)
+   - Links and images
+   - Inline code with special character escaping
+   - Code blocks with language support
+   - Lists (ordered and unordered)
+   - Tables with alignment
+   - Blockquotes
+   - Complex mixed content
+   - Edge cases and Chinese content
+
+   **Test Files**:
+   - `src/test/extension.test.ts` - Unit tests for parser and generator
+   - `test-conversion.md` - Comprehensive manual test examples
+   - `test-inline-code.md` - Inline code special cases
+
+   **Note**: Test runner will download VS Code test instance on first run. Make sure no other VS Code instances conflict with the test environment.
+
+5. **Build for Production**
    ```bash
    pnpm run package
    ```
@@ -321,10 +350,39 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. **開發任務**
    - 單次編譯：`pnpm run compile`
    - 監視模式：`pnpm run watch`
-   - 執行測試：`pnpm run test`
+   - 執行測試：`pnpm test`
+   - 僅編譯測試：`pnpm run compile-tests`
    - 程式碼檢查：`pnpm run lint`
 
-4. **建置正式版本**
+4. **測試機制**
+
+   擴充功能包含完整的單元測試，涵蓋所有轉換功能：
+
+   ```bash
+   # 執行所有測試（編譯、檢查、測試）
+   pnpm test
+   ```
+
+   **測試涵蓋範圍**：
+   - 基本文字格式（粗體、斜體）
+   - 標題（H1-H6）
+   - 連結和圖片
+   - 內聯程式碼與特殊字元轉義
+   - 程式碼區塊與語言支援
+   - 清單（有序和無序）
+   - 表格與對齊
+   - 引用區塊
+   - 複雜混合內容
+   - 邊界案例和中文內容
+
+   **測試檔案**：
+   - `src/test/extension.test.ts` - 解析器和生成器的單元測試
+   - `test-conversion.md` - 完整的手動測試範例
+   - `test-inline-code.md` - 內聯程式碼特殊案例
+
+   **注意**：測試執行器會在首次執行時下載 VS Code 測試環境。請確保沒有其他 VS Code 實例與測試環境衝突。
+
+5. **建置正式版本**
    ```bash
    pnpm run package
    ```

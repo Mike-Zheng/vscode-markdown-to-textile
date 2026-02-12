@@ -1,3 +1,13 @@
+# VS Code Extension Development
+out/
+dist/
+node_modules/
+.vscode-test/
+*.vsix
+
+# Compiled output
+*.js.map
+
 # Logs
 logs
 *.log
@@ -7,38 +17,35 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# OS
 .DS_Store
-dist
-dist-ssr
-coverage
 *.local
+Thumbs.db
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+# IDE
 .idea
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/settings.json
 
+# TypeScript
 *.tsbuildinfo
 
+# ESLint
 .eslintcache
 
-# Cypress
-/cypress/videos/
-/cypress/screenshots/
+# Testing
+coverage/
+.nyc_output/
 
-# Vitest
-__screenshots__/
-
-
-# env files
-.env.development
-.env.prod-china
-.env.prod-global
-.env.stage
-.env.prod-ovh
+# Environment
+.env
+.env.*
+!.env.example

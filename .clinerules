@@ -1,0 +1,318 @@
+# Cline Rules for Markdown to Textile Converter
+
+## Project Context
+
+This is a VS Code extension that converts Markdown to Textile markup for Redmine. The project uses TypeScript, Webpack, and a custom AST-based parser/generator architecture.
+
+## Core Principles
+
+1. **Maintain AST-First Architecture**: All conversions must go through the AST (Abstract Syntax Tree) layer. Never implement direct string-to-string conversions.
+
+2. **Test-Driven Development**: Every new feature or bug fix must include corresponding unit tests in `src/test/extension.test.ts`.
+
+3. **Type Safety**: Maintain full TypeScript type safety. Avoid `any` types unless absolutely necessary.
+
+4. **User Experience**: Always provide clear error messages and notifications via VS Code's notification system.
+
+## Code Modification Guidelines
+
+### When Modifying `markdown-ast.ts` (Parser)
+
+- **DO:**
+  - Add new node types to the `NodeType` union
+  - Extend `ASTNode` interface with optional properties
+  - Implement new `parse[Element]()` methods following existing patterns
+  - Maintain position tracking with `this.pos`
+  - Handle edge cases (empty strings, malformed input)
+  - Add inline documentation for complex parsing logic
+
+- **DON'T:**
+  - Mutate the input string
+  - Use global state or static variables
+  - Break existing parser methods without updating tests
+  - Add regex patterns without thorough testing
+  - Skip whitespace handling
+
+### When Modifying `textile-generator.ts` (Generator)
+
+- **DO:**
+  - Add new generation methods for new node types
+  - Use the `inTable` parameter to handle context-specific output
+  - Utilize `generateFormattedText()` for spacing around markers
+  - Escape special characters (like `%` → `&#37;`)
+  - Consider Redmine-specific Textile requirements
+
+- **DON'T:**
+  - Generate output without processing the AST
+  - Ignore spacing rules around Textile markers
+  - Hard-code repetitive patterns (use helper methods)
+  - Break table context awareness
+
+### When Modifying `extension.ts` (VS Code Extension)
+
+- **DO:**
+  - Follow VS Code extension API patterns
+  - Provide user-friendly error messages
+  - Use `editor.edit()` for text replacements
+  - Handle cases where no text is selected
+  - Register all disposables in `context.subscriptions`
+
+- **DON'T:**
+  - Access editor without null checks
+  - Throw unhandled exceptions
+  - Block the UI thread with long operations
+  - Modify global state
+
+### When Writing Tests
+
+- **DO:**
+  - Organize tests in logical suites
+  - Test both common cases and edge cases
+  - Use descriptive test names
+  - Test with non-ASCII content (Chinese, etc.)
+  - Assert both positive and negative cases
+
+- **DON'T:**
+  - Write tests that depend on execution order
+  - Use hardcoded file paths
+  - Skip testing error conditions
+  - Write tests without clear assertions
+
+## File Organization Rules
+
+### Source Files (`src/`)
+- `extension.ts` - VS Code extension lifecycle only
+- `markdown-ast.ts` - Parsing logic only (650+ lines)
+- `textile-generator.ts` - Generation logic only (280+ lines)
+- `test/extension.test.ts` - All unit tests
+
+### Root Files
+- `package.json` - Extension manifest, dependencies, scripts
+- `tsconfig.json` - TypeScript compilation settings (strict mode)
+- `webpack.config.js` - Bundling configuration
+- `eslint.config.mjs` - Linting rules
+- `view-ast.ts` - CLI debugging tool (not bundled)
+
+### Documentation
+- `README.md` - User-facing documentation (English + 繁體中文)
+- `TESTING.md` - Testing documentation (English + 繁體中文)
+- `AST-VIEWER.md` - AST debugging tool guide
+- `CHANGELOG.md` - Version history
+- `.agents.md` - AI agent instructions (this file's companion)
+
+## Development Workflow
+
+### Before Making Changes
+1. Read relevant sections of `.agents.md` for architecture details
+2. Check existing tests for similar functionality
+3. Run `pnpm run compile` to ensure project builds
+4. Run `pnpm test` to verify all tests pass
+
+### Making Changes
+1. Modify parser (`markdown-ast.ts`) if adding new Markdown syntax support
+2. Modify generator (`textile-generator.ts`) if changing Textile output
+3. Add comprehensive tests for changes
+4. Ensure no TypeScript errors: `pnpm run compile`
+5. Ensure no lint errors: `pnpm run lint`
+6. Test in Extension Development Host (F5 in VS Code)
+
+### After Making Changes
+1. Run full test suite: `pnpm test`
+2. Manually test with various inputs in Extension Development Host
+3. Update README.md if user-visible changes
+4. Update CHANGELOG.md with changes
+5. Commit with clear, descriptive message
+
+## Common Patterns
+
+### Parser Pattern
+```typescript
+private parse[Element](): ASTNode {
+  // 1. Detect element start
+  // 2. Consume markers/delimiters
+  // 3. Read content until end marker
+  // 4. Recursively parse nested content if needed
+  // 5. Return ASTNode with appropriate type and properties
+}
+```
+
+### Generator Pattern
+```typescript
+private generate[Element](node: ASTNode): string {
+  // 1. Extract properties from node
+  // 2. Recursively generate child content
+  // 3. Wrap in Textile markers/tags
+  // 4. Return formatted string
+}
+```
+
+### Test Pattern
+```typescript
+test('Description of what is tested', () => {
+  const result = convert('input markdown');
+  assert.strictEqual(result, 'expected textile');
+  // or
+  assert.ok(result.includes('partial match'));
+});
+```
+
+## Textile Syntax Reference (Quick)
+
+| Element | Markdown | Textile (Redmine) |
+|---------|----------|-------------------|
+| Heading | `# H1` | `h1. H1` |
+| Bold | `**text**` | `*text*` |
+| Italic | `*text*` | `_text_` |
+| Link | `[text](url)` | `"text":url` |
+| Image | `![alt](url)` | `!url(alt)!` |
+| Inline Code | `` `code` `` | `%{...}code%` or `@code@` (in tables) |
+| Code Block | ` ```lang` | `<pre><code class="lang">...</code></pre>` |
+| Unordered List | `- item` | `* item` |
+| Ordered List | `1. item` | `# item` |
+| Blockquote | `> text` | `bq. text` |
+| Table Header | `\| H \|` | `\|_. H \|` |
+| Table Cell (right) | N/A | `\|>. text\|` |
+
+## Special Handling Rules
+
+### Inline Code
+- **In paragraphs:** Use styled `%{font-size: 0.85em;...}code%`
+- **In tables:** Use simple `@code@`
+- **Escape:** Convert `%` to `&#37;` to prevent Textile interpretation
+
+### Lists
+- Track depth for nested lists
+- Use `*` for unordered, `#` for ordered
+- Repeat marker for each depth level: `**` = level 2, `***` = level 3
+
+### Tables
+- First row is header if second row is separator (`|---|---|`)
+- Use `_.` prefix for header cells
+- Use `>.` for right-aligned, `=.` for center-aligned cells
+- Inline code in tables uses `@code@` notation
+
+### Spacing Around Markers
+- Add spaces outside markers when adjacent to non-space characters
+- Example: `AB**C**.` → `AB *C*.` (space added before marker)
+- Preserve existing spaces: `AB **C** .` → `AB *C* .`
+
+## Error Handling
+
+### Parser Errors
+- Handle gracefully without crashing
+- Return best-effort AST even with malformed input
+- Log errors to console for debugging
+
+### Generator Errors
+- Never output empty strings without reason
+- Handle missing node properties with defaults
+- Warn if unexpected node types encountered
+
+### Extension Errors
+- Use `vscode.window.showErrorMessage()` for user-facing errors
+- Use `console.error()` for detailed error logging
+- Catch all exceptions in command handler
+
+## Performance Guidelines
+
+- Avoid unnecessary string concatenations (use array.join())
+- Don't use expensive regex operations in tight loops
+- Cache repeated computations
+- Keep parser single-pass where possible
+
+## Version Control Guidelines
+
+### Commit Messages
+- Use conventional commits format: `feat:`, `fix:`, `test:`, `docs:`, `refactor:`
+- Be specific: ❌ "fix bug" ✅ "fix: handle empty code blocks in tables"
+- Reference issues when applicable
+
+### What to Commit
+- Source code changes
+- Test additions/modifications
+- Configuration changes
+- Documentation updates
+
+### What NOT to Commit
+- `dist/` directory (generated by webpack)
+- `out/` directory (generated by test compilation)
+- `node_modules/`
+- `*.vsix` (extension packages)
+- Personal VS Code settings (except `.vscode/` defaults)
+
+## VS Code Extension Specific Rules
+
+### Command Registration
+- Command ID must match `package.json` contributes section
+- Always dispose registered commands
+- Provide user feedback for all command executions
+
+### Context Menu
+- Show commands only when appropriate (`editorHasSelection`)
+- Use appropriate menu groups (`1_modification`)
+
+### Extension Activation
+- Keep activation fast (< 100ms)
+- Lazy-load heavy dependencies
+- Use `activationEvents` wisely
+
+## Testing Requirements
+
+### Minimum Test Coverage
+- Every parser method must have at least one test
+- Every generator method must have at least one test
+- All edge cases must be tested (empty, whitespace, special chars)
+
+### Test Execution
+- All tests must pass before merging
+- Tests must be deterministic (no random failures)
+- Tests must run in < 5 seconds total
+
+## Documentation Requirements
+
+### Code Documentation
+- Add JSDoc comments for public methods
+- Document complex algorithms inline
+- Explain non-obvious design decisions
+
+### User Documentation
+- Update README.md for new features
+- Provide examples in both English and 繁體中文
+- Keep syntax conversion table up-to-date
+
+## When in Doubt
+
+1. Check `.agents.md` for architectural guidance
+2. Look at existing similar code for patterns
+3. Run the AST viewer tool: `npx ts-node view-ast.ts <file.md>`
+4. Test manually in Extension Development Host (F5)
+5. Ask for clarification rather than making assumptions
+
+## Prohibited Actions
+
+❌ **NEVER:**
+- Bypass the AST layer with direct string replacement
+- Commit code that doesn't compile
+- Skip writing tests for new code
+- Use `any` type without justification
+- Modify `package.json` dependencies without discussion
+- Change VS Code API usage without testing
+- Deploy without running full test suite
+
+## Quality Checklist
+
+Before considering any task complete:
+
+- [ ] Code compiles without errors (`pnpm run compile`)
+- [ ] All tests pass (`pnpm test`)
+- [ ] No lint errors (`pnpm run lint`)
+- [ ] New code has test coverage
+- [ ] Documentation updated if needed
+- [ ] Manually tested in Extension Development Host
+- [ ] No breaking changes to existing functionality
+- [ ] Error handling implemented
+- [ ] User notifications added where appropriate
+
+---
+
+**Remember:** This extension is for real users working with Redmine. Quality, reliability, and user experience are paramount. When in doubt, prioritize correctness over speed.

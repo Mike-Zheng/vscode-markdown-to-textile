@@ -176,8 +176,26 @@ export class MarkdownParser {
     const isOrdered = /^\d+\./.test(this.peekLine());
     const items: ASTNode[] = [];
     
-    while (this.pos < this.input.length && this.matchListStart()) {
+    while (this.pos < this.input.length) {
+      // Check if this is the same type of list
+      const currentLineOrdered = /^\d+\./.test(this.peekLine());
+      
+      // If list type changed, stop
+      if (currentLineOrdered !== isOrdered) {
+        break;
+      }
+      
+      // If not a list start, stop
+      if (!this.matchListStart()) {
+        break;
+      }
+      
       items.push(this.parseListItem(isOrdered));
+      
+      // Stop if we hit a double newline (empty line)
+      if (this.match('\n\n')) {
+        break;
+      }
     }
     
     return {
@@ -201,7 +219,10 @@ export class MarkdownParser {
     this.skipSpaces();
     
     const children = this.parseInline('\n');
-    this.advance(); // consume newline
+    
+    if (this.peek() === '\n') {
+      this.advance(); // consume newline
+    }
     
     return {
       type: 'listItem',
@@ -231,24 +252,30 @@ export class MarkdownParser {
   private parseInline(until: string): ASTNode[] {
     const nodes: ASTNode[] = [];
     
-    while (this.pos < this.input.length && this.peek() !== until) {
+    while (this.pos < this.input.length && !this.match(until)) {
+      const startPos = this.pos; // Track starting position
+      
       // Bold (**text** or __text__)
       if (this.match('**') || this.match('__')) {
         const marker = this.peek(2);
         this.advance(2);
         const children = this.parseInline(marker);
-        this.advance(2);
+        if (this.match(marker)) {
+          this.advance(2);
+        }
         nodes.push({ type: 'bold', children });
         continue;
       }
       
       // Italic (*text* or _text_)
-      if ((this.peek() === '*' && this.peek(2) !== '**') || 
-          (this.peek() === '_' && this.peek(2) !== '__')) {
+      if ((this.peek() === '*' && !this.match('**')) || 
+          (this.peek() === '_' && !this.match('__'))) {
         const marker = this.peek();
         this.advance();
         const children = this.parseInline(marker);
-        this.advance();
+        if (this.peek() === marker) {
+          this.advance();
+        }
         nodes.push({ type: 'italic', children });
         continue;
       }
@@ -267,10 +294,15 @@ export class MarkdownParser {
         this.advance(2);
         const alt = this.readUntil(']');
         this.advance(); // ]
-        this.advance(); // (
-        const url = this.readUntil(')');
-        this.advance(); // )
-        nodes.push({ type: 'image', url, alt });
+        if (this.peek() === '(') {
+          this.advance(); // (
+          const url = this.readUntil(')');
+          this.advance(); // )
+          nodes.push({ type: 'image', url, alt });
+        } else {
+          // Not a valid image, treat as text
+          nodes.push({ type: 'text', value: '![' + alt + ']' });
+        }
         continue;
       }
       
@@ -279,10 +311,17 @@ export class MarkdownParser {
         this.advance();
         const children = this.parseInline(']');
         this.advance(); // ]
-        this.advance(); // (
-        const url = this.readUntil(')');
-        this.advance(); // )
-        nodes.push({ type: 'link', url, children });
+        if (this.peek() === '(') {
+          this.advance(); // (
+          const url = this.readUntil(')');
+          this.advance(); // )
+          nodes.push({ type: 'link', url, children });
+        } else {
+          // Not a valid link, treat as text
+          nodes.push({ type: 'text', value: '[' });
+          nodes.push(...children);
+          nodes.push({ type: 'text', value: ']' });
+        }
         continue;
       }
       
@@ -296,7 +335,7 @@ export class MarkdownParser {
       // Plain text
       let text = '';
       while (this.pos < this.input.length && 
-             this.peek() !== until && 
+             !this.match(until) && 
              !this.peek().match(/[\*_`\[\!]/)) {
         text += this.peek();
         this.advance();
@@ -304,6 +343,12 @@ export class MarkdownParser {
       
       if (text) {
         nodes.push({ type: 'text', value: text });
+      }
+      
+      // Safety check: if position hasn't moved, force advance to prevent infinite loop
+      if (this.pos === startPos) {
+        nodes.push({ type: 'text', value: this.peek() });
+        this.advance();
       }
     }
     

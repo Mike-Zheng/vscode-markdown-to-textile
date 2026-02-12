@@ -140,21 +140,23 @@ export class TextileGenerator {
   }
   
   private generateInline(nodes: ASTNode[]): string {
-    return nodes.map(node => this.generateInlineNode(node)).join('');
+    return nodes.map((node, index) => this.generateInlineNode(node, index, nodes)).join('');
   }
   
-  private generateInlineNode(node: ASTNode): string {
+  private generateInlineNode(node: ASTNode, index: number, siblings: ASTNode[]): string {
     switch (node.type) {
       case 'text':
         return node.value || '';
         
       case 'bold':
         // Textile bold: *text*
-        return '*' + this.generateInline(node.children || []) + '*';
+        // Add spaces inside markers if adjacent to non-space text
+        return this.generateFormattedText(node, '*', index, siblings);
         
       case 'italic':
         // Textile italic: _text_
-        return '_' + this.generateInline(node.children || []) + '_';
+        // Add spaces inside markers if adjacent to non-space text
+        return this.generateFormattedText(node, '_', index, siblings);
         
       case 'code':
         // Redmine inline code with background color
@@ -179,5 +181,28 @@ export class TextileGenerator {
       default:
         return '';
     }
+  }
+  
+  private generateFormattedText(node: ASTNode, marker: string, index: number, siblings: ASTNode[]): string {
+    const content = this.generateInline(node.children || []);
+    
+    // Check if we need to add space before marker
+    const prevNode = index > 0 ? siblings[index - 1] : null;
+    const needSpaceBefore = prevNode && 
+                           prevNode.type === 'text' && 
+                           prevNode.value && 
+                           !/[\s\p{P}]$/u.test(prevNode.value);
+    
+    // Check if we need to add space after marker
+    const nextNode = index < siblings.length - 1 ? siblings[index + 1] : null;
+    const needSpaceAfter = nextNode && 
+                          nextNode.type === 'text' && 
+                          nextNode.value && 
+                          !/^[\s\p{P}]/u.test(nextNode.value);
+    
+    const spaceBefore = needSpaceBefore ? ' ' : '';
+    const spaceAfter = needSpaceAfter ? ' ' : '';
+    
+    return marker + spaceBefore + content + spaceAfter + marker;
   }
 }

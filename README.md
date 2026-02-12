@@ -76,6 +76,14 @@ A Visual Studio Code extension that converts Markdown syntax to Textile markup f
 | `1. item` | `# item` |
 | `> quote` | `bq. quote` |
 
+**Smart Spacing:**
+The converter automatically adds spaces inside Textile formatting markers when adjacent to text without spaces:
+- `AB**C**.` → `AB* C*.` (space added before C)
+- `test**bold**text` → `test* bold *text` (spaces added on both sides)
+- `AB **C** .` → `AB  *C*  .` (existing spaces preserved)
+
+This ensures proper Textile rendering, as markers like `*bold*` and `_italic_` require word boundaries.
+
 #### Code Blocks (Redmine Format)
 
 | Markdown | Textile (Redmine) |
@@ -294,6 +302,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 | `- 項目` | `* 項目` |
 | `1. 項目` | `# 項目` |
 | `> 引用` | `bq. 引用` |
+
+**智能空格處理：**
+轉換器會在 Textile 格式標記內側自動添加空格（當相鄰文字無空格時）：
+- `AB**C**.` → `AB* C*.`（在 C 前添加空格）
+- `test**bold**text` → `test* bold *text`（兩側都添加空格）
+- `AB **C** .` → `AB  *C*  .`（保持現有空格）
+
+這確保了正確的 Textile 渲染，因為 `*粗體*` 和 `_斜體_` 這類標記需要字詞邊界。
 
 #### 程式碼區塊（Redmine 格式）
 

@@ -33,6 +33,43 @@ suite('Markdown to Textile Converter Test Suite', () => {
 			assert.ok(result.includes('This is *bold*'));
 			assert.ok(result.includes('_italic_'));
 		});
+
+		test('Bold adjacent to text without spaces', () => {
+			const result = convert('AB**C**.');
+			// Should add spaces inside markers before text, not before punctuation
+			assert.ok(result.includes('AB* C*.') || result.includes('AB * C *.'));
+		});
+
+		test('Italic adjacent to text without spaces', () => {
+			const result = convert('AB*C*.');
+			// Should add spaces inside markers before text, not before punctuation
+			assert.ok(result.includes('AB_ C_.') || result.includes('AB _ C _.'));
+		});
+
+		test('Bold with existing spaces', () => {
+			const result = convert('AB **C** .');
+			// Should keep spaces: AB  * C *  .
+			assert.ok(result.includes('*C*'));
+		});
+
+		test('Italic with existing spaces', () => {
+			const result = convert('AB *C* .');
+			// Should keep spaces: AB  _ C _  .
+			assert.ok(result.includes('_C_'));
+		});
+
+		test('Bold between letters', () => {
+			const result = convert('test**bold**text');
+			// Should add spaces: test * bold * text
+			assert.ok(result.includes('test * bold * text') || result.includes('test* bold *text'));
+		});
+
+		test('Multiple formats adjacent', () => {
+			const result = convert('A**B***C*D');
+			// Complex case with bold and italic, spaces added between adjacent text
+			assert.ok(result.includes('A* B*') || result.includes('A * B *'));
+			assert.ok(result.includes('_C _') || result.includes('_ C _'));
+		});
 	});
 
 	suite('Headings', () => {

@@ -251,22 +251,22 @@ suite('Markdown to Textile Converter Test Suite', () => {
 			const markdown = '| Name | Age |\n|------|-----|\n| **Bold** | `code` |';
 			const result = convert(markdown);
 			assert.ok(result.includes('*Bold*'));
+			// Inline code in table should use @ format
+			assert.ok(result.includes('@code@'));
 		});
 
 		test('Table with inline code in parentheses', () => {
 			const markdown = '| 列名 | 描述 |\n|------|------|\n| 列表一（`內容一`） | 测试 |';
 			const result = convert(markdown);
-			// Should have space before and after inline code
-			assert.ok(result.includes('（ %{'));
-			assert.ok(result.includes('內容一%'));
+			// Inline code in table should use @ format
+			assert.ok(result.includes('@內容一@'));
 		});
 
 		test('Table with inline code between text', () => {
 			const markdown = '| 列名 | 描述 |\n|------|------|\n| 文字`code`文字 | 测试 |';
 			const result = convert(markdown);
-			// Should have spaces around inline code
-			assert.ok(result.includes('文字 %{'));
-			assert.ok(result.includes('code% 文字'));
+			// Inline code in table should use @ format
+			assert.ok(result.includes('@code@'));
 		});
 	});
 

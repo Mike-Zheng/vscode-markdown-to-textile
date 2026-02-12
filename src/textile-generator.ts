@@ -124,7 +124,7 @@ export class TextileGenerator {
       const isFirstRow = rowIndex === 0 && hasHeaderRow;
       
       return '|' + row.children.map((cell, cellIndex) => {
-        const content = this.generateInline(cell.children || []);
+        const content = this.generateInline(cell.children || [], true);
         const align = alignments[cellIndex] || 'left';
         
         if (isFirstRow) {
@@ -139,11 +139,11 @@ export class TextileGenerator {
     }).join('\n');
   }
   
-  private generateInline(nodes: ASTNode[]): string {
-    return nodes.map((node, index) => this.generateInlineNode(node, index, nodes)).join('');
+  private generateInline(nodes: ASTNode[], inTable: boolean = false): string {
+    return nodes.map((node, index) => this.generateInlineNode(node, index, nodes, inTable)).join('');
   }
   
-  private generateInlineNode(node: ASTNode, index: number, siblings: ASTNode[]): string {
+  private generateInlineNode(node: ASTNode, index: number, siblings: ASTNode[], inTable: boolean = false): string {
     switch (node.type) {
       case 'text':
         return node.value || '';
@@ -151,14 +151,20 @@ export class TextileGenerator {
       case 'bold':
         // Textile bold: *text*
         // Add spaces inside markers if adjacent to non-space text
-        return this.generateFormattedText(node, '*', index, siblings);
+        return this.generateFormattedText(node, '*', index, siblings, inTable);
         
       case 'italic':
         // Textile italic: _text_
         // Add spaces inside markers if adjacent to non-space text
-        return this.generateFormattedText(node, '_', index, siblings);
+        return this.generateFormattedText(node, '_', index, siblings, inTable);
         
       case 'code':
+        // In tables, use simple @ notation
+        // Outside tables, use Redmine inline code with background color
+        if (inTable) {
+          return '@' + (node.value || '') + '@';
+        }
+        
         // Redmine inline code with background color
         // Escape % characters to avoid Textile parsing issues
         const escapedCode = (node.value || '').replace(/%/g, '&#37;');
@@ -204,8 +210,8 @@ export class TextileGenerator {
     }
   }
   
-  private generateFormattedText(node: ASTNode, marker: string, index: number, siblings: ASTNode[]): string {
-    const content = this.generateInline(node.children || []);
+  private generateFormattedText(node: ASTNode, marker: string, index: number, siblings: ASTNode[], inTable: boolean = false): string {
+    const content = this.generateInline(node.children || [], inTable);
     
     // Check if we need to add space before/after markers
     // Textile requires spaces outside markers when adjacent to word characters (not punctuation)

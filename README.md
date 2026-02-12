@@ -71,6 +71,7 @@ A Visual Studio Code extension that converts Markdown syntax to Textile markup f
 | `[link](url)` | `"link":url` |
 | `![alt](image.jpg)` | `!image.jpg(alt)!` |
 | `` `code` `` | `%{font-size: 0.85em;padding: 0.2em 0.4em;background-color: #656c7633;border-radius: 3px;font-weight:bold;}code%` |
+| `` `code` `` (in table) | `@code@` |
 | ``` `` `code` `` ``` | Displays literal `` `code` `` with backticks |
 | `` `%PATH%` `` | `%{...}&#37;PATH&#37;%` (% escaped) |
 | ``` `` `%PATH%` `` ``` | Displays literal `` `%PATH%` `` with backticks |
@@ -100,8 +101,9 @@ This ensures proper Textile rendering, as markers like `*bold*` and `_italic_` r
 |----------|-------------------|
 | `| Header 1 | Header 2 |` <br> `|----------|----------|` <br> `| Cell 1   | Cell 2   |` | `|_.  Header 1 |_.  Header 2 |` <br> `|Cell 1|Cell 2|` |
 | `| Left | Center | Right |` <br> `|:-----|:------:|------:|` <br> `| L    | C      | R     |` | `|_.  Left |_.  Center |_.  Right |` <br> `|L|=. C|>. R|` |
+| `| Name | Code |` <br> `|------|------|` <br> `| Test | ` `` `code` `` ` |` | `|_.  Name |_.  Code |` <br> `|Test|@code@|` |
 
-> **Note**: Tables support left, center (`=.`), and right (`>.`) alignment in Redmine Textile format.
+> **Note**: Tables support left, center (`=.`), and right (`>.`) alignment in Redmine Textile format. Inline code in tables uses `@code@` format instead of the styled format used outside tables.
 
 ### Development Process
 
@@ -327,6 +329,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 | `[連結](url)` | `"連結":url` |
 | `![替代文字](image.jpg)` | `!image.jpg(替代文字)!` |
 | `` `程式碼` `` | `%{font-size: 0.85em;padding: 0.2em 0.4em;background-color: #656c7633;border-radius: 3px;font-weight:bold.}程式碼%` |
+| `` `程式碼` `` (在表格中) | `@程式碼@` |
 | ``` `` `程式碼` `` ``` | 顯示字面的 `` `程式碼` `` 包含反引號 |
 | `` `%PATH%` `` | `%{...}&#37;PATH&#37;%` (百分號轉義) |
 | ``` `` `%PATH%` `` ``` | 顯示字面的 `` `%PATH%` `` 包含反引號 |
@@ -356,8 +359,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 |----------|-------------------|
 | `| 標題 1 | 標題 2 |` <br> `|--------|--------|` <br> `| 內容 1 | 內容 2 |` | `|_.  標題 1 |_.  標題 2 |` <br> `|內容 1|內容 2|` |
 | `| 左對齊 | 置中 | 右對齊 |` <br> `|:------|:----:|------:|` <br> `| L     | C    | R     |` | `|_.  左對齊 |_.  置中 |_.  右對齊 |` <br> `|L|=. C|>. R|` |
+| `| 名稱 | 程式碼 |` <br> `|------|--------|` <br> `| 測試 | ` `` `code` `` ` |` | `|_.  名稱 |_.  程式碼 |` <br> `|測試|@code@|` |
 
-> **注意**：表格支援在 Redmine Textile 格式中的左對齊、置中（`=.`）和右對齊（`>.`）。
+> **注意**：表格支援在 Redmine Textile 格式中的左對齊、置中（`=.`）和右對齊（`>.`）。表格中的行內程式碼使用 `@code@` 格式，而非表格外使用的樣式格式。
 
 ### 開發流程
 

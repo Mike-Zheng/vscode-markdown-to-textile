@@ -450,44 +450,10 @@ export class MarkdownParser {
     // Parse cells
     while (this.pos < this.input.length && this.peek() !== '\n') {
       let cellContent = '';
-      let inBackticks = false;
-      let backtickCount = 0;
       
-      // Read until | or newline, but skip | inside backticks
-      while (this.pos < this.input.length && this.peek() !== '\n') {
-        const char = this.peek();
-        
-        // Track backticks to know when we're inside inline code
-        if (char === '`') {
-          if (!inBackticks) {
-            // Count opening backticks
-            backtickCount = 0;
-            let checkPos = this.pos;
-            while (checkPos < this.input.length && this.input[checkPos] === '`') {
-              backtickCount++;
-              checkPos++;
-            }
-            inBackticks = true;
-          } else {
-            // Check if this closes the inline code
-            let closeCount = 0;
-            let checkPos = this.pos;
-            while (checkPos < this.input.length && this.input[checkPos] === '`') {
-              closeCount++;
-              checkPos++;
-            }
-            if (closeCount === backtickCount) {
-              inBackticks = false;
-            }
-          }
-        }
-        
-        // If we hit | and we're not in backticks, it's a cell separator
-        if (char === '|' && !inBackticks) {
-          break;
-        }
-        
-        cellContent += char;
+      // Read until | or newline
+      while (this.pos < this.input.length && this.peek() !== '|' && this.peek() !== '\n') {
+        cellContent += this.peek();
         this.advance();
       }
       

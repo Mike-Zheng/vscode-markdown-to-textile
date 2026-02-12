@@ -134,6 +134,46 @@ suite('Markdown to Textile Converter Test Suite', () => {
 			const matches = result.match(/%\{[^}]+\}/g);
 			assert.strictEqual(matches?.length, 2);
 		});
+
+		test('Double backtick inline code', () => {
+			const result = convert('`` `code` ``');
+			// Should contain literal backticks
+			assert.ok(result.includes('`code`'));
+		});
+
+		test('Double backtick with special chars', () => {
+			const result = convert('`` `%PATH%` ``');
+			// Should contain literal backticks and escaped %
+			assert.ok(result.includes('`&#37;PATH&#37;`'));
+		});
+
+		test('Inline code in parentheses', () => {
+			const result = convert('文字（`code`）文字');
+			// Should have spaces around inline code
+			assert.ok(result.includes('（ %{'));
+			assert.ok(result.includes('code% ）'));
+		});
+
+		test('Inline code in italic', () => {
+			const result = convert('*斜体（`code`）*');
+			// Should have space before inline code
+			assert.ok(result.includes('（ %{'));
+			assert.ok(result.includes('code% ）'));
+		});
+
+		test('Inline code in bold', () => {
+			const result = convert('**粗体（`code`）**');
+			// Should have space before inline code
+			assert.ok(result.includes('（ %{'));
+			assert.ok(result.includes('code% ）'));
+		});
+
+		test('Inline code between text in italic', () => {
+			const result = convert('*文字`code`文字*');
+			// Should have spaces around inline code
+			assert.ok(result.includes('文字 %{'));
+			assert.ok(result.includes('code% 文字'));
+		});
 	});
 
 	suite('Code Blocks', () => {
@@ -176,6 +216,20 @@ suite('Markdown to Textile Converter Test Suite', () => {
 			assert.ok(result.includes('*bold*'));
 			assert.ok(result.includes('%{'));
 		});
+
+		test('List with inline code in parentheses', () => {
+			const result = convert('1. 列表一（`內容一`）');
+			// Should have space before and after inline code
+			assert.ok(result.includes('（ %{'));
+			assert.ok(result.includes('內容一%'));
+		});
+
+		test('List with inline code between text', () => {
+			const result = convert('- 文字`code`文字');
+			// Should have spaces around inline code
+			assert.ok(result.includes('文字 %{'));
+			assert.ok(result.includes('code% 文字'));
+		});
 	});
 
 	suite('Tables', () => {
@@ -197,6 +251,22 @@ suite('Markdown to Textile Converter Test Suite', () => {
 			const markdown = '| Name | Age |\n|------|-----|\n| **Bold** | `code` |';
 			const result = convert(markdown);
 			assert.ok(result.includes('*Bold*'));
+		});
+
+		test('Table with inline code in parentheses', () => {
+			const markdown = '| 列名 | 描述 |\n|------|------|\n| 列表一（`內容一`） | 测试 |';
+			const result = convert(markdown);
+			// Should have space before and after inline code
+			assert.ok(result.includes('（ %{'));
+			assert.ok(result.includes('內容一%'));
+		});
+
+		test('Table with inline code between text', () => {
+			const markdown = '| 列名 | 描述 |\n|------|------|\n| 文字`code`文字 | 测试 |';
+			const result = convert(markdown);
+			// Should have spaces around inline code
+			assert.ok(result.includes('文字 %{'));
+			assert.ok(result.includes('code% 文字'));
 		});
 	});
 
@@ -259,6 +329,20 @@ suite('Markdown to Textile Converter Test Suite', () => {
 			// Count asterisks, should have at least 6 for the 3 bold markers
 			const asteriskCount = (result.match(/\*/g) || []).length;
 			assert.ok(asteriskCount >= 6, `Expected at least 6 asterisks, got ${asteriskCount}`);
+		});
+
+		test('Unmatched backticks', () => {
+			const result = convert('Text with ` unmatched backtick');
+			// Should treat backtick as literal text and not crash
+			assert.ok(result.includes('Text with'));
+			assert.ok(result.includes('`'));
+		});
+
+		test('Many consecutive backticks', () => {
+			const result = convert('Text ````````` more text');
+			// Should handle gracefully without crashing
+			assert.ok(result.includes('Text'));
+			assert.ok(result.includes('more text'));
 		});
 	});
 });

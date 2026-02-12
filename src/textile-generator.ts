@@ -162,7 +162,28 @@ export class TextileGenerator {
         // Redmine inline code with background color
         // Escape % characters to avoid Textile parsing issues
         const escapedCode = (node.value || '').replace(/%/g, '&#37;');
-        return '%{font-size: 0.85em;padding: 0.2em 0.4em;background-color: #656c7633;border-radius: 3px;font-weight:bold;}' + escapedCode + '%';
+        const codeContent = '%{font-size: 0.85em;padding: 0.2em 0.4em;background-color: #656c7633;border-radius: 3px;font-weight:bold;}' + escapedCode + '%';
+        
+        // Check if we need to add space before/after the inline code
+        const prevNode = index > 0 ? siblings[index - 1] : null;
+        const nextNode = index < siblings.length - 1 ? siblings[index + 1] : null;
+        
+        // Add space before if previous text ends with non-space character
+        const needSpaceBefore = prevNode && 
+                               prevNode.type === 'text' && 
+                               prevNode.value && 
+                               !/\s$/.test(prevNode.value);
+        
+        // Add space after if next text starts with non-space character
+        const needSpaceAfter = nextNode && 
+                              nextNode.type === 'text' && 
+                              nextNode.value && 
+                              !/^\s/.test(nextNode.value);
+        
+        const spaceBefore = needSpaceBefore ? ' ' : '';
+        const spaceAfter = needSpaceAfter ? ' ' : '';
+        
+        return spaceBefore + codeContent + spaceAfter;
         
       case 'link':
         // Textile link: "link text":url

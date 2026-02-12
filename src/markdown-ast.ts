@@ -280,12 +280,55 @@ export class MarkdownParser {
         continue;
       }
       
-      // Inline code (`code`)
+      // Inline code (`code` or ``code with ` inside``)
       if (this.peek() === '`') {
-        this.advance();
-        const value = this.readUntil('`');
-        this.advance();
-        nodes.push({ type: 'code', value });
+        // Count the number of backticks (limit to reasonable number)
+        let backtickCount = 0;
+        let startPos = this.pos;
+        while (this.pos < this.input.length && this.peek() === '`' && backtickCount < 10) {
+          backtickCount++;
+          this.advance();
+        }
+        
+        // Read until we find the same number of backticks
+        let value = '';
+        let found = false;
+        let searchPos = this.pos;
+        while (searchPos < this.input.length) {
+          // Check if we found matching backticks
+          let matchCount = 0;
+          let checkPos = searchPos;
+          while (checkPos < this.input.length && 
+                 this.input[checkPos] === '`' && 
+                 matchCount < backtickCount) {
+            matchCount++;
+            checkPos++;
+          }
+          
+          if (matchCount === backtickCount) {
+            // Found matching backticks
+            value = this.input.substring(this.pos, searchPos);
+            this.pos = checkPos;
+            found = true;
+            break;
+          }
+          
+          // Not a match, continue searching
+          searchPos++;
+        }
+        
+        if (found) {
+          // Trim leading/trailing spaces if backtick count > 1
+          if (backtickCount > 1 && value) {
+            value = value.trim();
+          }
+          nodes.push({ type: 'code', value });
+        } else {
+          // No closing backticks found, treat first backtick as literal text
+          this.pos = startPos;
+          this.advance(); // Move past the first backtick
+          nodes.push({ type: 'text', value: '`' });
+        }
         continue;
       }
       

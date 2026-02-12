@@ -4,7 +4,7 @@
   "description": "Convert Markdown selection to Textile format for Redmine.",
   "version": "0.0.1",
   "author": "mikezheng",
-  "publisher": "markdown-to-textile",
+  "publisher": "mikezheng",
   "engines": {
     "vscode": "^1.109.0"
   },

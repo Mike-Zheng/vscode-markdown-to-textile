@@ -36,14 +36,14 @@ suite('Markdown to Textile Converter Test Suite', () => {
 
 		test('Bold adjacent to text without spaces', () => {
 			const result = convert('AB**C**.');
-			// Should add spaces inside markers before text, not before punctuation
-			assert.ok(result.includes('AB* C*.') || result.includes('AB * C *.'));
+			// Should add spaces outside markers: AB *C*. (space before marker, no space before punctuation)
+			assert.ok(result.includes('AB *C*.') || result.includes('AB* C*.') || result.includes('AB * C *.'));
 		});
 
 		test('Italic adjacent to text without spaces', () => {
 			const result = convert('AB*C*.');
-			// Should add spaces inside markers before text, not before punctuation
-			assert.ok(result.includes('AB_ C_.') || result.includes('AB _ C _.'));
+			// Should add spaces outside markers: AB _C_. (space before marker, no space before punctuation)
+			assert.ok(result.includes('AB _C_.') || result.includes('AB_ C_.') || result.includes('AB _ C _.'));
 		});
 
 		test('Bold with existing spaces', () => {
@@ -60,15 +60,15 @@ suite('Markdown to Textile Converter Test Suite', () => {
 
 		test('Bold between letters', () => {
 			const result = convert('test**bold**text');
-			// Should add spaces: test * bold * text
-			assert.ok(result.includes('test * bold * text') || result.includes('test* bold *text'));
+			// Should add spaces outside markers: test *bold* text
+			assert.ok(result.includes('test *bold* text') || result.includes('test * bold * text') || result.includes('test* bold *text'));
 		});
 
 		test('Multiple formats adjacent', () => {
 			const result = convert('A**B***C*D');
-			// Complex case with bold and italic, spaces added between adjacent text
-			assert.ok(result.includes('A* B*') || result.includes('A * B *'));
-			assert.ok(result.includes('_C _') || result.includes('_ C _'));
+			// Complex case with bold and italic, spaces added outside markers
+			assert.ok(result.includes('A *B*') || result.includes('A* B*') || result.includes('A * B *'));
+			assert.ok(result.includes('_C_') || result.includes('_C _') || result.includes('_ C _'));
 		});
 	});
 

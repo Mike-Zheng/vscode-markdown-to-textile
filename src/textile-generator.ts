@@ -186,15 +186,22 @@ export class TextileGenerator {
   private generateFormattedText(node: ASTNode, marker: string, index: number, siblings: ASTNode[]): string {
     const content = this.generateInline(node.children || []);
     
-    // Check if we need to add space before marker
+    // Check if we need to add space before/after markers
+    // Textile requires spaces outside markers when adjacent to word characters (not punctuation)
+    // Example: text,*bold*. is wrong → text, *bold*. is correct
+    //          text*bold*text is wrong → text *bold* text is correct
+    
     const prevNode = index > 0 ? siblings[index - 1] : null;
+    const nextNode = index < siblings.length - 1 ? siblings[index + 1] : null;
+    
+    // Add space before if previous text ends with non-space character (letter, digit, or punctuation)
+    // But Textile renders correctly when punctuation is followed by marker, so we add space after punctuation too
     const needSpaceBefore = prevNode && 
                            prevNode.type === 'text' && 
                            prevNode.value && 
-                           !/[\s\p{P}]$/u.test(prevNode.value);
+                           !/\s$/.test(prevNode.value);
     
-    // Check if we need to add space after marker
-    const nextNode = index < siblings.length - 1 ? siblings[index + 1] : null;
+    // Add space after only if next text starts with word character (not space, not punctuation)
     const needSpaceAfter = nextNode && 
                           nextNode.type === 'text' && 
                           nextNode.value && 
@@ -203,6 +210,7 @@ export class TextileGenerator {
     const spaceBefore = needSpaceBefore ? ' ' : '';
     const spaceAfter = needSpaceAfter ? ' ' : '';
     
-    return marker + spaceBefore + content + spaceAfter + marker;
+    // Space goes outside the markers: text, *bold* text
+    return spaceBefore + marker + content + marker + spaceAfter;
   }
 }

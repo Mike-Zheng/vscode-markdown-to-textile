@@ -173,8 +173,35 @@ The extension consists of three main modules:
 
 5. **Build for Production**
    ```bash
+   # Compile with production optimization
    pnpm run package
    ```
+
+6. **Package as VSIX**
+
+   Create a `.vsix` package for distribution or local installation:
+
+   ```bash
+   # Install packaging tool (one-time setup)
+   pnpm add -D @vscode/vsce
+
+   # Package the extension
+   npx @vscode/vsce package
+   ```
+
+   This generates `markdown-to-textile-0.0.1.vsix` in the project root.
+
+   **Install the packaged extension:**
+   
+   - **Via VS Code UI**: 
+     1. Press `Ctrl+Shift+P`
+     2. Type "Extensions: Install from VSIX..."
+     3. Select the `.vsix` file
+   
+   - **Via Command Line**:
+     ```bash
+     code --install-extension markdown-to-textile-0.0.1.vsix
+     ```
 
 #### Project Structure
 
@@ -400,8 +427,35 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 5. **建置正式版本**
    ```bash
+   # 以正式版本模式編譯並優化
    pnpm run package
    ```
+
+6. **打包成 VSIX**
+
+   建立 `.vsix` 套件用於分發或本機安裝：
+
+   ```bash
+   # 安裝打包工具（僅需執行一次）
+   pnpm add -D @vscode/vsce
+
+   # 打包擴充功能
+   npx @vscode/vsce package
+   ```
+
+   這會在專案根目錄生成 `markdown-to-textile-0.0.1.vsix` 檔案。
+
+   **安裝已打包的擴充功能：**
+   
+   - **透過 VS Code 介面**： 
+     1. 按 `Ctrl+Shift+P`
+     2. 輸入「Extensions: Install from VSIX...」
+     3. 選擇 `.vsix` 檔案
+   
+   - **透過命令列**：
+     ```bash
+     code --install-extension markdown-to-textile-0.0.1.vsix
+     ```
 
 #### 專案結構
 

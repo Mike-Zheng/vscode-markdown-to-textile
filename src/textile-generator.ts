@@ -79,22 +79,57 @@ export class TextileGenerator {
     return lines.join('\n');
   }
   
-  private generateList(node: ASTNode): string {
+  private generateList(node: ASTNode, depth: number = 1): string {
     if (!node.children) {
       return '';
     }
     
     const marker = node.ordered ? '#' : '*';
+    const prefix = marker.repeat(depth);
     
     return node.children
-      .map((item, index) => {
+      .map((item) => {
         if (item.type === 'listItem') {
-          const content = this.generateInline(item.children || []);
-          return marker + ' ' + content;
+          return this.generateListItem(item, prefix, depth);
         }
         return '';
       })
+      .filter(text => text !== '')
       .join('\n');
+  }
+  
+  private generateListItem(item: ASTNode, prefix: string, depth: number): string {
+    if (!item.children) {
+      return '';
+    }
+    
+    const results: string[] = [];
+    const inlineNodes: ASTNode[] = [];
+    
+    // Separate inline content from nested lists
+    for (const child of item.children) {
+      if (child.type === 'list') {
+        // If we have accumulated inline content, generate it first
+        if (inlineNodes.length > 0) {
+          const content = this.generateInline(inlineNodes);
+          results.push(prefix + ' ' + content);
+          inlineNodes.length = 0; // Clear
+        }
+        // Generate nested list
+        results.push(this.generateList(child, depth + 1));
+      } else {
+        // Accumulate inline nodes
+        inlineNodes.push(child);
+      }
+    }
+    
+    // Generate any remaining inline content
+    if (inlineNodes.length > 0) {
+      const content = this.generateInline(inlineNodes);
+      results.push(prefix + ' ' + content);
+    }
+    
+    return results.join('\n');
   }
   
   private generateTable(node: ASTNode): string {

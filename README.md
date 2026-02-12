@@ -87,6 +87,16 @@ The converter automatically adds spaces inside Textile formatting markers when a
 
 This ensures proper Textile rendering, as markers like `*bold*` and `_italic_` require word boundaries.
 
+#### Nested Lists
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
+| `- Item 1` <br> `  - Nested 1` <br> `  - Nested 2` <br> `- Item 2` | `* Item 1` <br> `** Nested 1` <br> `** Nested 2` <br> `* Item 2` |
+| `1. First` <br> `  1. Nested first` <br> `  2. Nested second` <br> `2. Second` | `# First` <br> `## Nested first` <br> `## Nested second` <br> `# Second` |
+| `- Level 1` <br> `  - Level 2` <br> `    - Level 3` | `* Level 1` <br> `** Level 2` <br> `*** Level 3` |
+
+> **Note**: Nested lists are created by indenting with 2 or more spaces. The number of `*` or `#` markers indicates the nesting level in Textile format.
+
 #### Code Blocks (Redmine Format)
 
 | Markdown | Textile (Redmine) |
@@ -344,6 +354,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - `AB **C** .` → `AB  *C*  .`（保持現有空格）
 
 這確保了正確的 Textile 渲染，因為 `*粗體*` 和 `_斜體_` 這類標記需要字詞邊界。
+
+#### 嵌套列表
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
+| `- 項目 1` <br> `  - 嵌套 1` <br> `  - 嵌套 2` <br> `- 項目 2` | `* 項目 1` <br> `** 嵌套 1` <br> `** 嵌套 2` <br> `* 項目 2` |
+| `1. 第一` <br> `  1. 嵌套第一` <br> `  2. 嵌套第二` <br> `2. 第二` | `# 第一` <br> `## 嵌套第一` <br> `## 嵌套第二` <br> `# 第二` |
+| `- 層級 1` <br> `  - 層級 2` <br> `    - 層級 3` | `* 層級 1` <br> `** 層級 2` <br> `*** 層級 3` |
+
+> **注意**：嵌套列表通過縮進 2 個或更多空格來創建。`*` 或 `#` 標記的數量表示 Textile 格式中的嵌套層級。
 
 #### 程式碼區塊（Redmine 格式）
 

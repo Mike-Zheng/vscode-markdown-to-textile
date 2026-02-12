@@ -30,6 +30,7 @@ export interface ASTNode {
   language?: string; // for code blocks
   isHeader?: boolean; // for table cells
   align?: 'left' | 'center' | 'right'; // for table cells
+  depth?: number; // for nested lists
 }
 
 export class MarkdownParser {
@@ -172,13 +173,25 @@ export class MarkdownParser {
     };
   }
   
-  private parseList(): ASTNode {
-    const isOrdered = /^\d+\./.test(this.peekLine());
+  private parseList(baseIndent: number = 0): ASTNode {
+    const isOrdered = /^\d+\./.test(this.peekLine().trimStart());
     const items: ASTNode[] = [];
     
     while (this.pos < this.input.length) {
+      // Check current line indentation
+      const indent = this.getIndentation();
+      // If indentation is less than base, we're done with this list
+      if (indent < baseIndent) {
+        break;
+      }
+      
+      // If indentation is more than base, skip (nested list handled in parseListItem)
+      if (indent > baseIndent) {
+        break;
+      }
+      
       // Check if this is the same type of list
-      const currentLineOrdered = /^\d+\./.test(this.peekLine());
+      const currentLineOrdered = /^\d+\./.test(this.peekLine().trimStart());
       
       // If list type changed, stop
       if (currentLineOrdered !== isOrdered) {
@@ -190,7 +203,14 @@ export class MarkdownParser {
         break;
       }
       
-      items.push(this.parseListItem(isOrdered));
+      // Consume the indentation spaces for this level
+      for (let i = 0; i < baseIndent; i++) {
+        if (this.peek() === ' ' || this.peek() === '\t') {
+          this.advance();
+        }
+      }
+      
+      items.push(this.parseListItem(isOrdered, baseIndent));
       
       // Stop if we hit a double newline (empty line)
       if (this.match('\n\n')) {
@@ -205,7 +225,7 @@ export class MarkdownParser {
     };
   }
   
-  private parseListItem(isOrdered: boolean): ASTNode {
+  private parseListItem(isOrdered: boolean, baseIndent: number): ASTNode {
     // Consume list marker
     if (isOrdered) {
       while (this.peek() !== '.') {
@@ -218,10 +238,25 @@ export class MarkdownParser {
     
     this.skipSpaces();
     
-    const children = this.parseInline('\n');
+    const children: ASTNode[] = [];
+    const inlineContent = this.parseInline('\n');
+    children.push(...inlineContent);
     
     if (this.peek() === '\n') {
       this.advance(); // consume newline
+    }
+    
+    // Check for nested list
+    while (this.pos < this.input.length) {
+      const nextIndent = this.getIndentation();
+      
+      // If next line has more indentation and is a list, it's nested
+      if (nextIndent > baseIndent && this.matchListStart()) {
+        const nestedList = this.parseList(nextIndent);
+        children.push(nestedList);
+      } else {
+        break;
+      }
     }
     
     return {
@@ -570,8 +605,22 @@ export class MarkdownParser {
   }
   
   private matchListStart(): boolean {
-    const line = this.peekLine().trim();
+    const line = this.peekLine().trimStart();
     return /^[\-\*\+]\s/.test(line) || /^\d+\.\s/.test(line);
+  }
+  
+  private getIndentation(): number {
+    let indent = 0;
+    let tempPos = this.pos;
+    while (tempPos < this.input.length && (this.input[tempPos] === ' ' || this.input[tempPos] === '\t')) {
+      if (this.input[tempPos] === '\t') {
+        indent += 2; // Count tab as 2 spaces
+      } else {
+        indent++;
+      }
+      tempPos++;
+    }
+    return indent;
   }
   
   private matchHorizontalRule(): boolean {

@@ -211,6 +211,29 @@ suite('Markdown to Textile Converter Test Suite', () => {
 			assert.ok(result.includes('# Second'));
 		});
 
+		test('Nested unordered list', () => {
+			const result = convert('- Item 1\n  - Nested 1\n  - Nested 2\n- Item 2');
+			assert.ok(result.includes('* Item 1'));
+			assert.ok(result.includes('** Nested 1'));
+			assert.ok(result.includes('** Nested 2'));
+			assert.ok(result.includes('* Item 2'));
+		});
+
+		test('Nested ordered list', () => {
+			const result = convert('1. First\n  1. Nested first\n  2. Nested second\n2. Second');
+			assert.ok(result.includes('# First'));
+			assert.ok(result.includes('## Nested first'));
+			assert.ok(result.includes('## Nested second'));
+			assert.ok(result.includes('# Second'));
+		});
+
+		test('Deep nested list', () => {
+			const result = convert('- Level 1\n  - Level 2\n    - Level 3');
+			assert.ok(result.includes('* Level 1'));
+			assert.ok(result.includes('** Level 2'));
+			assert.ok(result.includes('*** Level 3'));
+		});
+
 		test('Mixed content in list', () => {
 			const result = convert('- Item with **bold**\n- Item with `code`');
 			assert.ok(result.includes('*bold*'));

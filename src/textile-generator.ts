@@ -52,15 +52,56 @@ export class TextileGenerator {
   }
   
   private generateCodeBlock(node: ASTNode): string {
-    // Redmine Textile code block format: <pre><code class="language">
     const value = (node.value || '').trim();
     const language = node.language || '';
     
+    // Special handling for Mermaid diagrams
+    if (language.toLowerCase() === 'mermaid') {
+      const mermaidContent = this.convertMermaidToTextile(value);
+      return `{{mermaid\n${mermaidContent}\n}}`;
+    }
+    
+    // Redmine Textile code block format: <pre><code class="language">
     if (language) {
       return `<pre><code class="${language}">\n${value}\n</code></pre>`;
     } else {
       return `<pre><code>\n${value}\n</code></pre>`;
     }
+  }
+  
+  private convertMermaidToTextile(content: string): string {
+    // Convert Mermaid node labels from single to double quotes
+    // Patterns to match:
+    // [text] -> ["text"]
+    // {text} -> {"text"}
+    
+    let result = content;
+    
+    // Handle different bracket types:
+    // 1. Square brackets: [text] -> ["text"]
+    // Use negative lookahead to avoid matching brackets that are already inside quotes
+    result = result.replace(/\[([^\[\]"]*?)\]/g, (match, innerContent) => {
+      // Skip if already quoted or empty
+      if (!innerContent.trim() || innerContent.includes('"')) {
+        return match;
+      }
+      return `["${innerContent}"]`;
+    });
+    
+    // 2. Curly braces: {text} -> {"text"}
+    result = result.replace(/\{([^\{\}"]*?)\}/g, (match, innerContent) => {
+      // Skip if already quoted or empty
+      if (!innerContent.trim() || innerContent.includes('"')) {
+        return match;
+      }
+      return `{"${innerContent}"}`;
+    });
+    
+    // Note: We don't convert standalone parentheses () because they are usually
+    // part of the node label text (like "Button (Input...)") and should be preserved
+    // inside the quotes added by square bracket or curly brace conversion above.
+    
+    return result;
   }
   
   private generateBlockquote(node: ASTNode): string {

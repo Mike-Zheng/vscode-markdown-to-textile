@@ -368,4 +368,47 @@ suite('Markdown to Textile Converter Test Suite', () => {
 			assert.ok(result.includes('more text'));
 		});
 	});
+
+	suite('Mermaid Diagram Conversion', () => {
+		test('Basic Mermaid diagram with square brackets', () => {
+			const markdown = '```mermaid\ngraph TD\n    A[設計稿完成] --> B[配置 Theme];\n```';
+			const result = convert(markdown);
+			assert.ok(result.includes('{{mermaid'), 'Should start with {{mermaid');
+			assert.ok(result.includes('}}'), 'Should end with }}');
+			assert.ok(result.includes('A["設計稿完成"]'), 'Should convert [text] to ["text"]');
+			assert.ok(result.includes('B["配置 Theme"]'), 'Should convert all square brackets');
+		});
+
+		test('Mermaid diagram with curly braces', () => {
+			const markdown = '```mermaid\ngraph TD\n    A{決策點} --> B[結果];\n```';
+			const result = convert(markdown);
+			assert.ok(result.includes('A{"決策點"}'), 'Should convert {text} to {"text"}');
+			assert.ok(result.includes('B["結果"]'), 'Should convert [text] to ["text"]');
+		});
+
+		test('Mermaid diagram preserves existing quotes', () => {
+			const markdown = '```mermaid\ngraph TD\n    A["已有引號"] --> B[無引號];\n```';
+			const result = convert(markdown);
+			assert.ok(result.includes('A["已有引號"]'), 'Should preserve existing quotes');
+			assert.ok(result.includes('B["無引號"]'), 'Should add quotes to text without quotes');
+		});
+
+		test('Mermaid diagram with mixed content', () => {
+			const markdown = '```mermaid\ngraph TD\n    A[設計稿完成] --> B{初始化專案 & Tailwind};\n    B --> C[配置 CSS];\n    C --> D[CLI 引入元件 (Button, Input...)];\n```';
+			const result = convert(markdown);
+			assert.ok(result.includes('{{mermaid'), 'Should use Textile Mermaid format');
+			assert.ok(result.includes('A["設計稿完成"]'), 'Should convert square brackets');
+			assert.ok(result.includes('B{"初始化專案 & Tailwind"}'), 'Should convert curly braces');
+			assert.ok(result.includes('C["配置 CSS"]'), 'Should handle multiple nodes');
+			assert.ok(result.includes('D["CLI 引入元件 (Button, Input...)"]'), 'Should handle parentheses in text');
+		});
+
+		test('Non-Mermaid code blocks remain unchanged', () => {
+			const markdown = '```javascript\nconst x = [1, 2, 3];\n```';
+			const result = convert(markdown);
+			assert.ok(result.includes('<pre><code class="javascript">'), 'Should use regular code block format');
+			assert.ok(result.includes('const x = [1, 2, 3];'), 'Should preserve JavaScript syntax');
+			assert.ok(!result.includes('{{mermaid'), 'Should not use Mermaid format');
+		});
+	});
 });

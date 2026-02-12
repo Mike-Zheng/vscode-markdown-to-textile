@@ -14,10 +14,19 @@
   "contributes": {
     "commands": [
       {
-        "command": "markdown-to-textile.helloWorld",
-        "title": "Hello World"
+        "command": "markdown-to-textile.convertToTextile",
+        "title": "Convert Markdown to Textile"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "markdown-to-textile.convertToTextile",
+          "when": "editorHasSelection",
+          "group": "1_modification"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run package",

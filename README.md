@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="src/icon.png" alt="Markdown to Textile Icon" width="128" height="128" />
+<img src="./img/icon.png" alt="Markdown to Textile Icon" width="128" height="128" />
 
 </div>
 
@@ -10,7 +10,7 @@
 
 ---
 
-![preview](./src/preview.gif)
+![preview](./img/preview.gif)
 
 ## English
 

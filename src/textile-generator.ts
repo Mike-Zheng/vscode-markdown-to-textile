@@ -159,10 +159,8 @@ export class TextileGenerator {
         return this.generateFormattedText(node, '_', index, siblings);
         
       case 'code':
-        // Redmine inline code with background color
-        // Escape % characters to avoid Textile parsing issues
-        const escapedCode = (node.value || '').replace(/%/g, '&#37;');
-        const codeContent = '%{font-size: 0.85em;padding: 0.2em 0.4em;background-color: #656c7633;border-radius: 3px;font-weight:bold;}' + escapedCode + '%';
+        // Redmine inline code: @code@
+        const codeContent = '@' + (node.value || '') + '@';
         
         // Check if we need to add space before/after the inline code
         const prevNode = index > 0 ? siblings[index - 1] : null;

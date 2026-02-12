@@ -70,9 +70,9 @@ A Visual Studio Code extension that converts Markdown syntax to Textile markup f
 | `*italic*` | `_italic_` |
 | `[link](url)` | `"link":url` |
 | `![alt](image.jpg)` | `!image.jpg(alt)!` |
-| `` `code` `` | `%{font-size: 0.85em;padding: 0.2em 0.4em;background-color: #656c7633;border-radius: 3px;font-weight:bold;}code%` |
+| `` `code` `` | `@code@` |
 | ``` `` `code` `` ``` | Displays literal `` `code` `` with backticks |
-| `` `%PATH%` `` | `%{...}&#37;PATH&#37;%` (% escaped) |
+| `` `%PATH%` `` | `@%PATH%@` |
 | ``` `` `%PATH%` `` ``` | Displays literal `` `%PATH%` `` with backticks |
 | `- item` | `* item` |
 | `1. item` | `# item` |
@@ -101,7 +101,10 @@ This ensures proper Textile rendering, as markers like `*bold*` and `_italic_` r
 | `| Header 1 | Header 2 |` <br> `|----------|----------|` <br> `| Cell 1   | Cell 2   |` | `|_.  Header 1 |_.  Header 2 |` <br> `|Cell 1|Cell 2|` |
 | `| Left | Center | Right |` <br> `|:-----|:------:|------:|` <br> `| L    | C      | R     |` | `|_.  Left |_.  Center |_.  Right |` <br> `|L|=. C|>. R|` |
 
-> **Note**: Tables support left, center (`=.`), and right (`>.`) alignment in Redmine Textile format.
+> **Note**: 
+> - Tables support left, center (`=.`), and right (`>.`) alignment in Redmine Textile format.
+> - Inline code with pipes (e.g., `` `| Header |` ``) inside table cells is correctly handled.
+> - HTML tags like `<br>` are preserved for multi-line cell content.
 
 ### Development Process
 
@@ -326,9 +329,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 | `*斜體*` | `_斜體_` |
 | `[連結](url)` | `"連結":url` |
 | `![替代文字](image.jpg)` | `!image.jpg(替代文字)!` |
-| `` `程式碼` `` | `%{font-size: 0.85em;padding: 0.2em 0.4em;background-color: #656c7633;border-radius: 3px;font-weight:bold.}程式碼%` |
+| `` `程式碼` `` | `@程式碼@` |
 | ``` `` `程式碼` `` ``` | 顯示字面的 `` `程式碼` `` 包含反引號 |
-| `` `%PATH%` `` | `%{...}&#37;PATH&#37;%` (百分號轉義) |
+| `` `%PATH%` `` | `@%PATH%@` |
 | ``` `` `%PATH%` `` ``` | 顯示字面的 `` `%PATH%` `` 包含反引號 |
 | `- 項目` | `* 項目` |
 | `1. 項目` | `# 項目` |
@@ -357,7 +360,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 | `| 標題 1 | 標題 2 |` <br> `|--------|--------|` <br> `| 內容 1 | 內容 2 |` | `|_.  標題 1 |_.  標題 2 |` <br> `|內容 1|內容 2|` |
 | `| 左對齊 | 置中 | 右對齊 |` <br> `|:------|:----:|------:|` <br> `| L     | C    | R     |` | `|_.  左對齊 |_.  置中 |_.  右對齊 |` <br> `|L|=. C|>. R|` |
 
-> **注意**：表格支援在 Redmine Textile 格式中的左對齊、置中（`=.`）和右對齊（`>.`）。
+> **注意**：
+> - 表格支援在 Redmine Textile 格式中的左對齊、置中（`=.`）和右對齊（`>.`）。
+> - 表格單元格內包含竖線的 inline code（如 `` `| 標題 |` ``）能正確處理。
+> - HTML 標籤如 `<br>` 會被保留，用於多行單元格內容。
 
 ### 開發流程
 

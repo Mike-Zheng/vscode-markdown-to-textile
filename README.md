@@ -32,6 +32,7 @@ A Visual Studio Code extension that converts Markdown syntax to Textile markup f
   - Blockquotes
   - Horizontal rules
   - Line breaks
+  - Mermaid diagrams (Redmine plugin format)
 - **AST-Based Parser**: Uses Abstract Syntax Tree for accurate conversion
 - **Context Menu Integration**: Right-click on selected text to convert
 - **User-Friendly**: Shows success/error notifications for all operations
@@ -116,6 +117,14 @@ This ensures proper Textile rendering, as markers like `*bold*` and `_italic_` r
 | ` ```javascript` <br> `code here` <br> ` ``` ` | `<pre><code class="javascript">` <br> `code here` <br> `</code></pre>` |
 | ` ```python` <br> `code here` <br> ` ``` ` | `<pre><code class="python">` <br> `code here` <br> `</code></pre>` |
 | ` ``` ` <br> `code here` <br> ` ``` ` | `<pre><code>` <br> `code here` <br> `</code></pre>` |
+
+#### Mermaid Diagrams (Redmine Plugin Format)
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
+| ` ```mermaid` <br> `graph TD` <br> `    A[Start] --> B[End];` <br> ` ``` ` | `{{mermaid` <br> `graph TD` <br> `    A["Start"] --> B["End"];` <br> `}}` |
+
+> **Note**: Mermaid diagrams are converted to Redmine's `{{mermaid}}` plugin format. Node labels in square brackets `[text]` are automatically converted to double-quoted format `["text"]` for better compatibility. Requires the Redmine Mermaid macro plugin to be installed.
 
 #### Tables (Redmine Format)
 
@@ -308,6 +317,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
   - 引用區塊
   - 水平分隔線
   - 換行符號
+  - Mermaid 圖表（Redmine 插件格式）
 - **基於 AST 的解析器**：使用抽象語法樹確保精確轉換
 - **右鍵選單整合**：右鍵點擊選取的文字即可轉換
 - **使用者友善**：所有操作都會顯示成功/錯誤通知
@@ -392,6 +402,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 | ` ```javascript` <br> `程式碼內容` <br> ` ``` ` | `<pre><code class="javascript">` <br> `程式碼內容` <br> `</code></pre>` |
 | ` ```python` <br> `程式碼內容` <br> ` ``` ` | `<pre><code class="python">` <br> `程式碼內容` <br> `</code></pre>` |
 | ` ``` ` <br> `程式碼內容` <br> ` ``` ` | `<pre><code>` <br> `程式碼內容` <br> `</code></pre>` |
+
+#### Mermaid 圖表（Redmine 插件格式）
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
+| ` ```mermaid` <br> `graph TD` <br> `    A[開始] --> B[結束];` <br> ` ``` ` | `{{mermaid` <br> `graph TD` <br> `    A["開始"] --> B["結束"];` <br> `}}` |
+
+> **注意**：Mermaid 圖表會轉換為 Redmine 的 `{{mermaid}}` 插件格式。方括號中的節點標籤 `[文字]` 會自動轉換為雙引號格式 `["文字"]` 以獲得更好的相容性。需要安裝 Redmine Mermaid macro 插件。
 
 #### 表格（Redmine 格式）
 

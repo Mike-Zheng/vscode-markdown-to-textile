@@ -14,6 +14,20 @@ This is a VS Code extension that converts Markdown to Textile markup for Redmine
 
 4. **User Experience**: Always provide clear error messages and notifications via VS Code's notification system.
 
+## Supported Features
+
+### Markdown to Textile Conversions
+
+1. **Basic Formatting**: Headings, bold, italic, links, images
+2. **Lists**: Ordered and unordered with nesting support
+3. **Code**: Inline code and code blocks with syntax highlighting
+4. **Tables**: Full table support with alignment (left, center, right)
+5. **Blockquotes**: Single and multi-line quotes
+6. **Mermaid Diagrams**: Converts ```mermaid blocks to {{mermaid}} format
+   - Automatically converts node labels from `[text]` to `["text"]`
+   - Supports graph TD, flowcharts, and other Mermaid diagram types
+   - Requires Redmine Mermaid macro plugin
+
 ## Code Modification Guidelines
 
 ### When Modifying `markdown-ast.ts` (Parser)

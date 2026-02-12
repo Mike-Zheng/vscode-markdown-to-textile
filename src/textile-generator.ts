@@ -53,7 +53,7 @@ export class TextileGenerator {
   
   private generateCodeBlock(node: ASTNode): string {
     // Redmine Textile code block format: <pre><code class="language">
-    const value = node.value || '';
+    const value = (node.value || '').trim();
     const language = node.language || '';
     
     if (language) {
@@ -155,8 +155,10 @@ export class TextileGenerator {
         return '_' + this.generateInline(node.children || []) + '_';
         
       case 'code':
-        // Textile inline code: @code@
-        return '@' + (node.value || '') + '@';
+        // Redmine inline code with background color
+        // Escape % characters to avoid Textile parsing issues
+        const escapedCode = (node.value || '').replace(/%/g, '&#37;');
+        return '%{font-size: 0.85em;padding: 0.2em 0.4em;background-color: #656c7633;border-radius: 3px;font-weight:bold;}' + escapedCode + '%';
         
       case 'link':
         // Textile link: "link text":url

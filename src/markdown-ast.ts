@@ -112,7 +112,9 @@ export class MarkdownParser {
     this.skipSpaces();
     
     const children = this.parseInline('\n');
-    this.advance(); // consume newline
+    if (this.peek() === '\n') {
+      this.advance(); // consume newline
+    }
     
     return {
       type: 'heading',
@@ -208,6 +210,12 @@ export class MarkdownParser {
   }
   
   private parseParagraph(): ASTNode {
+    // Check if line starts with heading marker that wasn't caught
+    const line = this.peekLine();
+    if (/^#{1,6}\s/.test(line)) {
+      return this.parseHeading();
+    }
+    
     const children = this.parseInline('\n');
     
     if (this.peek() === '\n') {
@@ -361,22 +369,30 @@ export class MarkdownParser {
         this.advance();
       }
       
-      // Parse cell content as inline
-      const parser = new MarkdownParser();
+      // Only add cell if we have content or if it's not the last character
       const cellContentTrimmed = cellContent.trim();
-      const cellAST = parser.parse(cellContentTrimmed);
-      const children = cellAST.children && cellAST.children.length > 0 && cellAST.children[0].type === 'paragraph'
-        ? cellAST.children[0].children || []
-        : [{ type: 'text' as NodeType, value: cellContentTrimmed }];
       
-      cells.push({
-        type: 'tableCell',
-        children
-      });
+      if (cellContentTrimmed || this.peek() === '|') {
+        // Parse cell content as inline
+        const parser = new MarkdownParser();
+        const cellAST = parser.parse(cellContentTrimmed);
+        const children = cellAST.children && cellAST.children.length > 0 && cellAST.children[0].type === 'paragraph'
+          ? cellAST.children[0].children || []
+          : [{ type: 'text' as NodeType, value: cellContentTrimmed }];
+        
+        cells.push({
+          type: 'tableCell',
+          children
+        });
+      }
       
       // Consume |
       if (this.peek() === '|') {
         this.advance();
+        // If next char is newline, break (don't add empty cell)
+        if (this.peek() === '\n') {
+          break;
+        }
       }
     }
     

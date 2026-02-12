@@ -31,6 +31,8 @@ export class TextileGenerator {
         return this.generateBlockquote(node);
       case 'list':
         return this.generateList(node);
+      case 'table':
+        return this.generateTable(node);
       case 'horizontalRule':
         return '---';
       default:
@@ -50,14 +52,14 @@ export class TextileGenerator {
   }
   
   private generateCodeBlock(node: ASTNode): string {
-    // Textile code block format: bc. code or bc.. for multi-line
+    // Redmine Textile code block format: <pre><code class="language">
     const value = node.value || '';
-    const lines = value.split('\n');
+    const language = node.language || '';
     
-    if (lines.length === 1) {
-      return 'bc. ' + value;
+    if (language) {
+      return `<pre><code class="${language}">\n${value}\n</code></pre>`;
     } else {
-      return 'bc.. ' + value + '\n\np. ';
+      return `<pre><code>\n${value}\n</code></pre>`;
     }
   }
   
@@ -93,6 +95,46 @@ export class TextileGenerator {
         return '';
       })
       .join('\n');
+  }
+  
+  private generateTable(node: ASTNode): string {
+    if (!node.children) {
+      return '';
+    }
+    
+    let hasHeaderRow = false;
+    let alignments: Array<'left' | 'center' | 'right'> = [];
+    const rows = node.children.filter(child => child.type === 'tableRow');
+    
+    // Check if second row is a separator (alignment row)
+    if (rows.length >= 2 && rows[1].children) {
+      const secondRow = rows[1];
+      if (secondRow.children && secondRow.children.every(cell => cell.isHeader)) {
+        hasHeaderRow = true;
+        alignments = secondRow.children.map(cell => cell.align || 'left');
+        rows.splice(1, 1); // Remove separator row
+      }
+    }
+    
+    return rows.map((row, rowIndex) => {
+      if (!row.children) return '';
+      
+      const isFirstRow = rowIndex === 0 && hasHeaderRow;
+      
+      return '|' + row.children.map((cell, cellIndex) => {
+        const content = this.generateInline(cell.children || []);
+        const align = alignments[cellIndex] || 'left';
+        
+        if (isFirstRow) {
+          // Header cell
+          return '_.  ' + content + ' ';
+        } else {
+          // Regular cell with alignment
+          const alignPrefix = align === 'center' ? '=. ' : align === 'right' ? '>. ' : '';
+          return alignPrefix + content;
+        }
+      }).join('|') + '|';
+    }).join('\n');
   }
   
   private generateInline(nodes: ASTNode[]): string {

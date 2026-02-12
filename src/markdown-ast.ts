@@ -14,7 +14,10 @@ export type NodeType =
   | 'codeBlock'
   | 'text'
   | 'lineBreak'
-  | 'horizontalRule';
+  | 'horizontalRule'
+  | 'table'
+  | 'tableRow'
+  | 'tableCell';
 
 export interface ASTNode {
   type: NodeType;
@@ -25,6 +28,8 @@ export interface ASTNode {
   alt?: string; // for images
   ordered?: boolean; // for lists
   language?: string; // for code blocks
+  isHeader?: boolean; // for table cells
+  align?: 'left' | 'center' | 'right'; // for table cells
 }
 
 export class MarkdownParser {
@@ -66,6 +71,11 @@ export class MarkdownParser {
     // Horizontal rule (---, ***, ___)
     if (this.matchHorizontalRule()) {
       return this.parseHorizontalRule();
+    }
+    
+    // Table
+    if (this.matchTableStart()) {
+      return this.parseTable();
     }
     
     // Heading
@@ -297,6 +307,108 @@ export class MarkdownParser {
     return { type: 'horizontalRule' };
   }
   
+  private parseTable(): ASTNode {
+    const rows: ASTNode[] = [];
+    
+    while (this.pos < this.input.length && this.matchTableStart()) {
+      rows.push(this.parseTableRow());
+    }
+    
+    return {
+      type: 'table',
+      children: rows
+    };
+  }
+  
+  private parseTableRow(): ASTNode {
+    const cells: ASTNode[] = [];
+    let isHeader = false;
+    
+    // Skip leading whitespace
+    this.skipWhitespace();
+    
+    // Consume opening |
+    if (this.peek() === '|') {
+      this.advance();
+    }
+    
+    const line = this.peekLine();
+    
+    // Check if this is a separator row (e.g., |---|---|
+    if (this.matchTableSeparator(line)) {
+      // Parse alignment from separator
+      const alignments = this.parseTableAlignments(line);
+      this.skipToNextLine();
+      // Return a special row to indicate header
+      return {
+        type: 'tableRow',
+        children: alignments.map(align => ({
+          type: 'tableCell',
+          isHeader: true,
+          align,
+          children: []
+        }))
+      };
+    }
+    
+    // Parse cells
+    while (this.pos < this.input.length && this.peek() !== '\n') {
+      let cellContent = '';
+      
+      // Read until | or newline
+      while (this.pos < this.input.length && this.peek() !== '|' && this.peek() !== '\n') {
+        cellContent += this.peek();
+        this.advance();
+      }
+      
+      // Parse cell content as inline
+      const parser = new MarkdownParser();
+      const cellContentTrimmed = cellContent.trim();
+      const cellAST = parser.parse(cellContentTrimmed);
+      const children = cellAST.children && cellAST.children.length > 0 && cellAST.children[0].type === 'paragraph'
+        ? cellAST.children[0].children || []
+        : [{ type: 'text' as NodeType, value: cellContentTrimmed }];
+      
+      cells.push({
+        type: 'tableCell',
+        children
+      });
+      
+      // Consume |
+      if (this.peek() === '|') {
+        this.advance();
+      }
+    }
+    
+    // Consume newline
+    if (this.peek() === '\n') {
+      this.advance();
+    }
+    
+    return {
+      type: 'tableRow',
+      children: cells
+    };
+  }
+  
+  private matchTableSeparator(line: string): boolean {
+    return /^\|?\s*:?-+:?\s*\|/.test(line);
+  }
+  
+  private parseTableAlignments(line: string): Array<'left' | 'center' | 'right'> {
+    const cells = line.split('|').filter(c => c.trim());
+    return cells.map(cell => {
+      const trimmed = cell.trim();
+      if (trimmed.startsWith(':') && trimmed.endsWith(':')) {
+        return 'center';
+      } else if (trimmed.endsWith(':')) {
+        return 'right';
+      } else {
+        return 'left';
+      }
+    });
+  }
+  
   // Helper methods
   private peek(length: number = 1): string {
     return this.input.substr(this.pos, length);
@@ -361,5 +473,10 @@ export class MarkdownParser {
   private matchHorizontalRule(): boolean {
     const line = this.peekLine().trim();
     return /^(\-{3,}|\*{3,}|_{3,})$/.test(line);
+  }
+  
+  private matchTableStart(): boolean {
+    const line = this.peekLine().trim();
+    return line.startsWith('|') || /^\|.*\|/.test(line);
   }
 }

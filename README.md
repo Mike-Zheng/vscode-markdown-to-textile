@@ -1,4 +1,4 @@
-# Markdown to Textile Converter
+# Markdown to Textile Converter for Redmine
 
 [English](#english) | [繁體中文](#繁體中文)
 
@@ -8,7 +8,7 @@
 
 ### Overview
 
-A Visual Studio Code extension that converts Markdown syntax to Textile markup format. This tool is particularly useful for users who need to migrate content from Markdown-based systems to platforms that use Textile markup, such as Redmine.
+A Visual Studio Code extension that converts Markdown syntax to Textile markup format specifically optimized for Redmine. This tool is designed for users who need to migrate content from Markdown-based systems to Redmine's Textile markup format, supporting all common Redmine Textile features including tables and code blocks with syntax highlighting.
 
 ### Features
 
@@ -18,7 +18,9 @@ A Visual Studio Code extension that converts Markdown syntax to Textile markup f
   - Bold and italic text
   - Links and images
   - Ordered and unordered lists
-  - Code blocks and inline code
+  - Code blocks with syntax highlighting (Redmine CodeRay format)
+  - Inline code
+  - Tables with alignment support
   - Blockquotes
   - Horizontal rules
   - Line breaks
@@ -58,8 +60,10 @@ A Visual Studio Code extension that converts Markdown syntax to Textile markup f
 
 ### Syntax Conversion Examples
 
-| Markdown | Textile |
-|----------|---------|
+#### Basic Formatting
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
 | `# Heading 1` | `h1. Heading 1` |
 | `## Heading 2` | `h2. Heading 2` |
 | `**bold**` | `*bold*` |
@@ -70,6 +74,23 @@ A Visual Studio Code extension that converts Markdown syntax to Textile markup f
 | `- item` | `* item` |
 | `1. item` | `# item` |
 | `> quote` | `bq. quote` |
+
+#### Code Blocks (Redmine Format)
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
+| ` ```javascript` <br> `code here` <br> ` ``` ` | `<pre><code class="javascript">` <br> `code here` <br> `</code></pre>` |
+| ` ```python` <br> `code here` <br> ` ``` ` | `<pre><code class="python">` <br> `code here` <br> `</code></pre>` |
+| ` ``` ` <br> `code here` <br> ` ``` ` | `<pre><code>` <br> `code here` <br> `</code></pre>` |
+
+#### Tables (Redmine Format)
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
+| `| Header 1 | Header 2 |` <br> `|----------|----------|` <br> `| Cell 1   | Cell 2   |` | `|_.  Header 1 |_.  Header 2 |` <br> `|Cell 1|Cell 2|` |
+| `| Left | Center | Right |` <br> `|:-----|:------:|------:|` <br> `| L    | C      | R     |` | `|_.  Left |_.  Center |_.  Right |` <br> `|L|=. C|>. R|` |
+
+> **Note**: Tables support left, center (`=.`), and right (`>.`) alignment in Redmine Textile format.
 
 ### Development Process
 
@@ -158,8 +179,9 @@ vscode-markdown-to-textile/
 ### Known Issues
 
 - Complex nested structures may require manual adjustment
-- Some advanced Markdown features (tables, footnotes) are not yet supported
+- Some advanced Markdown features (footnotes, task lists) are not yet supported
 - HTML embedded in Markdown is not converted
+- Nested tables are not supported
 
 ### Contributing
 
@@ -175,7 +197,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ### 概述
 
-這是一個 Visual Studio Code 擴充功能，能將 Markdown 語法轉換為 Textile 標記格式。此工具特別適合需要將內容從基於 Markdown 的系統遷移到使用 Textile 標記的平台（如 Redmine）的使用者。
+這是一個專為 Redmine 優化的 Visual Studio Code 擴充功能，能將 Markdown 語法轉換為 Textile 標記格式。此工具專為需要將內容遷移到 Redmine 的 Textile 標記格式的使用者設計，支援所有常見的 Redmine Textile 功能，包括表格和帶有語法高亮的程式碼區塊。
 
 ### 功能特色
 
@@ -185,7 +207,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
   - 粗體和斜體文字
   - 連結和圖片
   - 有序和無序列表
-  - 程式碼區塊和行內程式碼
+  - 帶有語法高亮的程式碼區塊（Redmine CodeRay 格式）
+  - 行內程式碼
+  - 支援對齊的表格
   - 引用區塊
   - 水平分隔線
   - 換行符號
@@ -225,8 +249,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ### 語法轉換範例
 
-| Markdown | Textile |
-|----------|---------|
+#### 基本格式
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
 | `# 標題 1` | `h1. 標題 1` |
 | `## 標題 2` | `h2. 標題 2` |
 | `**粗體**` | `*粗體*` |
@@ -237,6 +263,23 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 | `- 項目` | `* 項目` |
 | `1. 項目` | `# 項目` |
 | `> 引用` | `bq. 引用` |
+
+#### 程式碼區塊（Redmine 格式）
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
+| ` ```javascript` <br> `程式碼內容` <br> ` ``` ` | `<pre><code class="javascript">` <br> `程式碼內容` <br> `</code></pre>` |
+| ` ```python` <br> `程式碼內容` <br> ` ``` ` | `<pre><code class="python">` <br> `程式碼內容` <br> `</code></pre>` |
+| ` ``` ` <br> `程式碼內容` <br> ` ``` ` | `<pre><code>` <br> `程式碼內容` <br> `</code></pre>` |
+
+#### 表格（Redmine 格式）
+
+| Markdown | Textile (Redmine) |
+|----------|-------------------|
+| `| 標題 1 | 標題 2 |` <br> `|--------|--------|` <br> `| 內容 1 | 內容 2 |` | `|_.  標題 1 |_.  標題 2 |` <br> `|內容 1|內容 2|` |
+| `| 左對齊 | 置中 | 右對齊 |` <br> `|:------|:----:|------:|` <br> `| L     | C    | R     |` | `|_.  左對齊 |_.  置中 |_.  右對齊 |` <br> `|L|=. C|>. R|` |
+
+> **注意**：表格支援在 Redmine Textile 格式中的左對齊、置中（`=.`）和右對齊（`>.`）。
 
 ### 開發流程
 
@@ -325,8 +368,9 @@ vscode-markdown-to-textile/
 ### 已知問題
 
 - 複雜的巢狀結構可能需要手動調整
-- 部分進階 Markdown 功能（表格、註腳）尚未支援
+- 部分進階 Markdown 功能（註腳、任務清單）尚未支援
 - Markdown 中嵌入的 HTML 不會被轉換
+- 不支援巢狀表格
 
 ### 貢獻
 

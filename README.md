@@ -1,8 +1,16 @@
 # Markdown to Textile Converter for Redmine
 
+<div align="center">
+
+<img src="src/icon.png" alt="Markdown to Textile Icon" width="128" height="128" />
+
+</div>
+
 [English](#english) | [繁體中文](#繁體中文)
 
 ---
+
+![preview](./src/preview.gif)
 
 ## English
 
@@ -33,17 +41,20 @@ A Visual Studio Code extension that converts Markdown syntax to Textile markup f
 #### From Source
 
 1. Clone this repository:
+
    ```bash
    git clone https://github.com/yourusername/vscode-markdown-to-textile.git
    cd vscode-markdown-to-textile
    ```
 
 2. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 3. Compile the extension:
+
    ```bash
    pnpm run compile
    ```
@@ -81,6 +92,7 @@ A Visual Studio Code extension that converts Markdown syntax to Textile markup f
 
 **Smart Spacing:**
 The converter automatically adds spaces inside Textile formatting markers when adjacent to text without spaces:
+
 - `AB**C**.` → `AB* C*.` (space added before C)
 - `test**bold**text` → `test* bold *text` (spaces added on both sides)
 - `AB **C** .` → `AB  *C*  .` (existing spaces preserved)
@@ -91,9 +103,9 @@ This ensures proper Textile rendering, as markers like `*bold*` and `_italic_` r
 
 | Markdown | Textile (Redmine) |
 |----------|-------------------|
-| `- Item 1` <br> `  - Nested 1` <br> `  - Nested 2` <br> `- Item 2` | `* Item 1` <br> `** Nested 1` <br> `** Nested 2` <br> `* Item 2` |
-| `1. First` <br> `  1. Nested first` <br> `  2. Nested second` <br> `2. Second` | `# First` <br> `## Nested first` <br> `## Nested second` <br> `# Second` |
-| `- Level 1` <br> `  - Level 2` <br> `    - Level 3` | `* Level 1` <br> `** Level 2` <br> `*** Level 3` |
+| `- Item 1` <br> `- Nested 1` <br> `- Nested 2` <br> `- Item 2` | `* Item 1` <br> `** Nested 1` <br> `** Nested 2` <br> `* Item 2` |
+| `1. First` <br> `1. Nested first` <br> `2. Nested second` <br> `2. Second` | `# First` <br> `## Nested first` <br> `## Nested second` <br> `# Second` |
+| `- Level 1` <br> `- Level 2` <br> `- Level 3` | `* Level 1` <br> `** Level 2` <br> `*** Level 3` |
 
 > **Note**: Nested lists are created by indenting with 2 or more spaces. The number of `*` or `#` markers indicates the nesting level in Textile format.
 
@@ -139,6 +151,7 @@ The extension consists of three main modules:
 #### Development Setup
 
 1. **Prerequisites**
+
    ```bash
    Node.js >= 22.x
    pnpm >= 10.x
@@ -146,6 +159,7 @@ The extension consists of three main modules:
    ```
 
 2. **Install Dependencies**
+
    ```bash
    pnpm install
    ```
@@ -186,6 +200,7 @@ The extension consists of three main modules:
    **Note**: Test runner will download VS Code test instance on first run. Make sure no other VS Code instances conflict with the test environment.
 
 5. **Build for Production**
+
    ```bash
    # Compile with production optimization
    pnpm run package
@@ -206,13 +221,14 @@ The extension consists of three main modules:
    This generates `markdown-to-textile-0.0.1.vsix` in the project root.
 
    **Install the packaged extension:**
-   
-   - **Via VS Code UI**: 
+
+   - **Via VS Code UI**:
      1. Press `Ctrl+Shift+P`
      2. Type "Extensions: Install from VSIX..."
      3. Select the `.vsix` file
-   
+
    - **Via Command Line**:
+
      ```bash
      code --install-extension markdown-to-textile-0.0.1.vsix
      ```
@@ -301,17 +317,20 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 #### 從原始碼安裝
 
 1. 複製此儲存庫：
+
    ```bash
    git clone https://github.com/yourusername/vscode-markdown-to-textile.git
    cd vscode-markdown-to-textile
    ```
 
 2. 安裝相依套件：
+
    ```bash
    pnpm install
    ```
 
 3. 編譯擴充功能：
+
    ```bash
    pnpm run compile
    ```
@@ -349,6 +368,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 **智能空格處理：**
 轉換器會在 Textile 格式標記內側自動添加空格（當相鄰文字無空格時）：
+
 - `AB**C**.` → `AB* C*.`（在 C 前添加空格）
 - `test**bold**text` → `test* bold *text`（兩側都添加空格）
 - `AB **C** .` → `AB  *C*  .`（保持現有空格）
@@ -359,9 +379,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 | Markdown | Textile (Redmine) |
 |----------|-------------------|
-| `- 項目 1` <br> `  - 嵌套 1` <br> `  - 嵌套 2` <br> `- 項目 2` | `* 項目 1` <br> `** 嵌套 1` <br> `** 嵌套 2` <br> `* 項目 2` |
-| `1. 第一` <br> `  1. 嵌套第一` <br> `  2. 嵌套第二` <br> `2. 第二` | `# 第一` <br> `## 嵌套第一` <br> `## 嵌套第二` <br> `# 第二` |
-| `- 層級 1` <br> `  - 層級 2` <br> `    - 層級 3` | `* 層級 1` <br> `** 層級 2` <br> `*** 層級 3` |
+| `- 項目 1` <br> `- 嵌套 1` <br> `- 嵌套 2` <br> `- 項目 2` | `* 項目 1` <br> `** 嵌套 1` <br> `** 嵌套 2` <br> `* 項目 2` |
+| `1. 第一` <br> `1. 嵌套第一` <br> `2. 嵌套第二` <br> `2. 第二` | `# 第一` <br> `## 嵌套第一` <br> `## 嵌套第二` <br> `# 第二` |
+| `- 層級 1` <br> `- 層級 2` <br> `- 層級 3` | `* 層級 1` <br> `** 層級 2` <br> `*** 層級 3` |
 
 > **注意**：嵌套列表通過縮進 2 個或更多空格來創建。`*` 或 `#` 標記的數量表示 Textile 格式中的嵌套層級。
 
@@ -407,6 +427,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 #### 開發環境設定
 
 1. **先決條件**
+
    ```bash
    Node.js >= 22.x
    pnpm >= 10.x
@@ -414,6 +435,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
    ```
 
 2. **安裝相依套件**
+
    ```bash
    pnpm install
    ```
@@ -454,6 +476,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
    **注意**：測試執行器會在首次執行時下載 VS Code 測試環境。請確保沒有其他 VS Code 實例與測試環境衝突。
 
 5. **建置正式版本**
+
    ```bash
    # 以正式版本模式編譯並優化
    pnpm run package
@@ -474,13 +497,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
    這會在專案根目錄生成 `markdown-to-textile-0.0.1.vsix` 檔案。
 
    **安裝已打包的擴充功能：**
-   
-   - **透過 VS Code 介面**： 
+
+   - **透過 VS Code 介面**：
      1. 按 `Ctrl+Shift+P`
      2. 輸入「Extensions: Install from VSIX...」
      3. 選擇 `.vsix` 檔案
-   
+
    - **透過命令列**：
+
      ```bash
      code --install-extension markdown-to-textile-0.0.1.vsix
      ```

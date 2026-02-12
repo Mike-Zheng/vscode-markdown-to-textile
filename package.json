@@ -2,9 +2,10 @@
   "name": "markdown-to-textile",
   "displayName": "Markdown to Textile",
   "description": "Convert Markdown selection to Textile format for Redmine.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "mikezheng",
   "publisher": "mikezheng",
+  "icon": "src/icon.png",
   "engines": {
     "vscode": "^1.109.0"
   },
